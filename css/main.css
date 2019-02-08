@@ -1,0 +1,197 @@
+body {
+	color: dimgrey;
+	padding: 0px;
+	margin: 0px;
+	font-family: 'Libre Baskerville', serif;
+	font-size: 0.8rem;
+	background-color: #083D77;
+	background-image: url(../gfx/back.png);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: bottom 0px left 0px;
+}
+a { color: darkblue; text-decoration: none; }
+a:hover { color: red; }
+div, h1, h2, h3, p, button, footer, header {
+	box-sizing: border-box;
+	position: relative;
+	overflow: hidden;
+	padding: 0px;
+	margin: 0px;
+}
+canvas {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 1000;
+}
+header {
+	position: absolute;
+	top: 10px;
+	left: 0px;
+	width: 300px;
+	padding: 10px;
+	background-color: rgba(255,255,255,0.9);
+	border-radius: 0 10px 10px 0;
+	text-align: center;
+	z-index: 5000;
+}
+h1 {
+	text-transform: uppercase;
+	font-weight: normal;
+	font-size: 1.5rem;
+}
+h1::first-letter {
+	font-size: 1.8rem;
+}
+#settings {
+	position: absolute;
+	bottom: 10px;
+	right: 0px;
+	width: 250px;
+	padding: 20px;
+	background-color: rgba(255,255,255,0.9);
+	border-radius: 10px 0 0 10px; 
+	z-index: 10000;
+}
+input[type=range] {
+	width: 100px;
+}
+p.buttons {
+	text-align: center;
+}
+button {
+	display: inline-block;
+	width: 24%;
+	float: left;
+	font-size: 0.6rem;
+	color: dimgray;
+	text-transform: uppercase;
+	border: 1px solid grey;
+	padding: 5px 5px;
+	margin-right: 1px;
+}
+button:hover {
+	color: green !important;
+	cursor: pointer;
+}
+button:hover:disabled {
+	cursor: not-allowed;
+}
+button:disabled {
+	color: lightgray !important;
+}
+fieldset {
+	margin-top: 10px;
+	border: 1px solid grey;
+}
+legend {
+	font-size: 0.6rem;
+	text-transform: uppercase;
+}
+span.rangeValue {
+	display: inline-block;
+	width: 34px;
+	padding: 3px;
+	border: 1px solid grey;
+	font-size: 0.7rem;
+}
+span.label {
+	display: inline-block;
+	width: 35px;
+}
+footer {
+	position: absolute;
+	bottom: 10px;
+	left: 0px;
+	width: 66%;
+	padding: 10px;
+	background-color: rgba(255,255,255,0.9);
+	border-radius: 0 10px 10px 0;
+	z-index: 5000;
+}
+footer div.info {
+	width: 50%;
+	float: left;
+}
+p.author {
+	margin-bottom: 3px;
+	text-transform: uppercase;
+}
+p.release {
+	font-size: 0.6rem;
+	padding-top: 3px;
+}
+footer div.links {
+	width: 50%;
+	float: left;
+}
+div.links p {
+	text-align: right;
+}
+div.links a {
+	box-sizing: border-box;
+	display: inline-block;
+	padding: 0px;
+	background-repeat: no-repeat;
+	background-size: auto 25px;
+	background-position: left 5px center;
+	border-radius: 5px;
+	margin-top: 5px;
+	text-align: left;
+	text-indent: -999px;
+	width: 35px;
+	height: 25px;
+}
+a.youtube { background-image: url(../gfx/tube.png); }
+a.github { background-image: url(../gfx/git.png); }
+a.linkedin { background-image: url(../gfx/in.png); }
+a.twitter { background-image: url(../gfx/twit.png); }
+a.youtube:hover { background-image: url(../gfx/tube1.png); }
+a.github:hover { background-image: url(../gfx/git1.png); }
+a.linkedin:hover { background-image: url(../gfx/in1.png); }
+a.twitter:hover { background-image: url(../gfx/twit1.png); }
+
+
+@media screen and (max-width: 700px) {
+	
+	body {
+		padding-bottom: 80px;
+	}	
+	header {
+		top: 0px;
+		left: 0px;
+		right: 0px;
+		text-align: center;
+		border-radius: 0px;
+		width: 100%;
+	}
+	header h1 { font-size: 1.5rem; }
+	#settings {
+		position: relative;
+		margin: 100px auto 0 auto;
+		border-radius: 5px;
+	}
+	footer {
+		position: absolute;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		width: 100%;
+		z-index: 5000;
+		padding: 10px;
+		background-color: rgba(255,255,255,0.9);
+		border-radius: 0px;
+	}
+	#settings.mini {
+		position: absolute;
+		bottom: 0px;
+		right: 0px;
+	}
+	p.author {
+		font-size: 0.7rem;	
+	}
+	div.links a {
+		margin-top: 0px;
+	}
+}
