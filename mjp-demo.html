@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>Javascript - Flocking Boids - Craig Reynolds Algorithm</title>
+		<meta name="author" content="Matthew Page">
+		<meta name="description" content="">
+		<meta name="keywords" content="">
+		<link href="css/main.css" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Libre+Baskerville" rel="stylesheet">
+	</head>
+	<body style="background-color: transparent">
+
+		<!-- Sky for the boids to fly in -->
+		<canvas id="sky"></canvas>
+
+		<!-- Setting and controls -->
+		<div id="settings">
+			<p class="buttons">
+				<button id="buttonPlay" onclick="play(); this.blur()">Pause</button>
+				<button id="buttonStep" onclick="step(); this.blur()" disabled>Step</button>
+				<button id="buttonReset" onclick="reset(); this.blur()">Reset</button>
+				<button id="buttonToggleDisplay" onclick="toggleDisplay(); this.blur()">Hide</button>
+			</p>
+			<fieldset>
+				<legend>Display Options</legend>
+				<p><input type="checkbox" id="showVector"> Show vector</p>
+				<p><input type="checkbox" id="showPerception"> Show perception</p>
+			</fieldset>
+			<fieldset>
+				<legend>Flock Settings</legend>
+				<p><span class="label">Size </span><input id="setFlockSize" value="200" min="10" max="500" type="range" onchange="reset()">
+					<span class="rangeValue" id="displayFlockSize">0</span></p>
+			</fieldset>
+			<fieldset>
+				<legend>Perception</legend>
+				<p><span class="label">Rad </span><input type="range" min="0" max="500" step="1" value="465" id="setPRadius">
+					<span class="rangeValue" id="displayPRadius">0</span></p>
+				<p><span class="label">Ang </span><input type="range" min="0.25" max="6" step="0.1" value="4" id="setPAngle">
+					<span class="rangeValue" id="displayPAngle">0</span></p>
+			</fieldset>
+			<fieldset>
+				<legend>Cohesion</legend>
+				<p>
+					<span class="label"><input type="checkbox" id="enableCohesion" checked>
+					</span><input type="range" min="0" max="0.5" step="0.01" value="0.18" id="setCohesion">
+					<span class="rangeValue" id="displayCohesion"></span>
+				</p>
+			</fieldset>
+			<fieldset>
+				<legend>Alignment</legend>
+				<p>
+					<span class="label"><input type="checkbox" id="enableAlignment" checked>
+					</span><input type="range" min="0" max="0.1" step="0.01" value="0.01" id="setAlignment">
+					<span class="rangeValue" id="displayAlignment"></span>
+				</p>
+			</fieldset>
+			<fieldset>
+				<legend>Separation</legend>
+				<p>
+					<span class="label"><input type="checkbox" id="enableSeparation" checked>
+					</span><input type="range" min="0" max="0.25" step="0.001" value="0.13" id="setSeparation">
+					<span class="rangeValue" id="displaySeparation"></span>
+				</p>
+			</fieldset>
+		</div>
+
+		<!-- Load some scripts -->
+		<script src="js/vector.js" type="text/javascript"></script>
+		<script src="js/boid.js" type="text/javascript"></script>
+		<script src="js/boid-flock.js" type="text/javascript"></script>
+		<script src="js/boid-world.js" type="text/javascript"></script>
+
+		<!-- Main demo script -->
+		<script type="text/javascript">
+
+			/* Window resize */
+			let resizeId = false;
+			window.onresize = function() {
+				clearTimeout(resizeId);
+				resizeId = setTimeout(location.reload(), 1000);
+			};
+
+			/* The sky */
+			const sky = document.getElementById("sky");
+			const skyCTX = sky.getContext("2d");
+			sky.width = window.innerWidth;
+			sky.height = window.innerHeight;
+
+			/* Settings elements in the HTML DOM */
+			const settings = {
+				alignment: document.getElementById("setAlignment"),
+				cohesion: document.getElementById("setCohesion"),
+				separation: document.getElementById("setSeparation"),
+				enableAlignment: document.getElementById("enableAlignment"),
+				enableCohesion: document.getElementById("enableCohesion"),
+				enableSeparation: document.getElementById("enableSeparation"),
+				pRadius: document.getElementById("setPRadius"),
+				pAngle: document.getElementById("setPAngle"),
+				flockSize: document.getElementById("setFlockSize"),
+				showVector: document.getElementById("showVector"),
+				showPerception: document.getElementById("showPerception")
+			};
+			/* Display elements in the HTML DOM */
+			const display = {
+				alignment: document.getElementById("displayAlignment"),
+				cohesion: document.getElementById("displayCohesion"),
+				separation: document.getElementById("displaySeparation"),
+				flockSize: document.getElementById("displayFlockSize"),
+				pRadius: document.getElementById("displayPRadius"),
+				pAngle: document.getElementById("displayPAngle")
+			};
+
+			/* If it's mobile reduce the default number of boids */
+			if(window.innerWidth <= 640) settings.flockSize.value = 40;
+
+			/* Create the boid world and a new flock */
+			let boidWorld = new BoidWorld(window.innerWidth, window.innerHeight);
+			let boidFlock = new BoidFlock(settings.flockSize.value, boidWorld);
+			boidFlock.populate();
+			boidWorld.addFlock(boidFlock);
+
+			let animator = false;
+			let isPaused = false;
+			let isHidden = false;
+
+			/**
+			 * Main animation loop - runs continuosly
+			 */
+			function animationLoop() {
+
+				skyCTX.clearRect(0, 0, sky.width, sky.height);
+				if(!isPaused) boidWorld.update();
+				boidFlock.boids.forEach((boid)=>{
+					drawBoid(boid);
+				});
+				// /* Draw the predator */
+				// skyCTX.fillStyle = "red";
+				// skyCTX.beginPath();
+				// skyCTX.arc(250, 250, 5, 0, 2 * Math.PI);
+				// skyCTX.fill();
+
+				/* Update the Flock with the settings from the HTML DOM */
+				boidFlock.pRadius = settings.pRadius.value;
+				boidFlock.pAngle = settings.pAngle.value;
+				boidFlock.cohesion = (settings.enableCohesion.checked) ? settings.cohesion.value : 0;
+				boidFlock.alignment = (settings.enableAlignment.checked) ? settings.alignment.value : 0;
+				boidFlock.separation = (settings.enableSeparation.checked) ? settings.separation.value : 0;
+
+				/* Update the HTML display elements with current values */
+				display.alignment.textContent = settings.alignment.value;
+				display.cohesion.textContent = settings.cohesion.value;
+				display.separation.textContent = settings.separation.value;
+				display.flockSize.textContent = settings.flockSize.value;
+				display.pRadius.textContent = settings.pRadius.value;
+				display.pAngle.innerHTML = `${(settings.pAngle.value*(180/Math.PI)).toFixed(0)}&deg;`;
+
+				animator = requestAnimationFrame(animationLoop);
+			}
+			/**
+			 * Toggle the display panels
+			 */
+			function toggleDisplay() {
+				isHidden = !isHidden;
+				if(isHidden) {
+					document.getElementById("buttonToggleDisplay").textContent = "Info";
+					document.querySelectorAll("fieldset, header, footer").forEach((el)=>{
+						el.style.display = "none";
+					});
+					document.querySelector("#settings").classList.add("mini");
+				} else {
+					document.getElementById("buttonToggleDisplay").textContent = "Hide";
+					document.querySelectorAll("fieldset, header, footer").forEach((el)=>{
+						el.style.display = "block";
+					});
+					document.querySelector("#settings").classList.remove("mini");
+				}
+			}
+			/**
+			 * Reset the simulation
+			 */
+			function reset() {
+				cancelAnimationFrame(animator);
+				boidWorld.removeFlock(0);
+				boidFlock = new BoidFlock(settings.flockSize.value, boidWorld);
+				boidFlock.populate();
+				boidWorld.addFlock(boidFlock);
+				animator = requestAnimationFrame(animationLoop);
+			}
+			/**
+			 * Toggle play / pause
+			 */
+			function play() {
+				isPaused = !isPaused;
+				if(isPaused) {
+					document.getElementById("buttonPlay").textContent = "Play";
+					document.getElementById("buttonStep").disabled = false;
+				} else {
+					document.getElementById("buttonPlay").textContent = "Pause";
+					document.getElementById("buttonStep").disabled = true;
+				}
+			}
+			/**
+			 * Take a single step through the algorithm
+			 */
+			function step() {
+				skyCTX.clearRect(0, 0, sky.width, sky.height);
+				isPaused = false;
+				boidWorld.update();
+				isPaused = true;
+			}
+			/**
+			 * Draw a boid on the screen
+			 */
+			function drawBoid(boid) {
+
+				/* Draw the perception radius and angle, just the firs boid */
+				if(showPerception.checked && ( boid.index == 0 )) {
+					skyCTX.fillStyle = "rgba(255,255,255,0.3)";
+					skyCTX.beginPath();
+					skyCTX.arc(
+						boid.position.x,
+						boid.position.y,
+						boid.flock.pRadius,
+						boid.velocity.heading-(settings.pAngle.value/2),
+						boid.velocity.heading+(settings.pAngle.value/2)
+					);
+					skyCTX.lineTo(boid.position.x, boid.position.y);
+					skyCTX.fill();
+				}
+
+				/* Draw the Boid as a dot */
+				skyCTX.fillStyle = "white";
+				// skyCTX.fillStyle = `hsl(${boid.position.x+boid.position.y}, ${boid.velocity.mag*30}%, 50%)`;
+				// skyCTX.fillStyle = `hsl(${boid.velocity.mag*100}, 100%, 50%)`;
+				skyCTX.beginPath();
+				skyCTX.arc(boid.position.x, boid.position.y, 5, 0, 2 * Math.PI);
+				skyCTX.fill();
+
+				/* Draw the boid as a triangle */
+				//drawPolygon(skyCTX, boid.position.x, boid.position.y, 3, 10, 1, 'white', 'white', boid.velocity.heading);
+
+				/* Draw the Vector line */
+				if(showVector.checked) {
+					let endPoint = boid.position.copy();
+					endPoint.add(boid.velocity.copy().mul(30));
+
+					skyCTX.strokeStyle = "rgba(255,255,255,0.4)";
+					skyCTX.beginPath();
+					skyCTX.moveTo(boid.position.x, boid.position.y);
+					skyCTX.lineTo(endPoint.x, endPoint.y);
+					skyCTX.stroke();
+				}
+			}
+
+function drawPolygon(ctx, centerX,centerY,sideCount,size,strokeWidth,strokeColor,fillColor,radians){
+    ctx.translate(centerX,centerY);
+    ctx.rotate(radians);
+    ctx.beginPath();
+    //ctx.moveTo (size * Math.cos(0), size * Math.sin(0));
+	ctx.moveTo (size, 0);
+    for (var i = 1; i <= sideCount;i += 1) {
+        ctx.lineTo (size * Math.cos(i * 2 * Math.PI / 3), size * Math.sin(i * 2 * Math.PI / 3));
+    }
+    ctx.closePath();
+    ctx.fillStyle=fillColor;
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = strokeWidth;
+    ctx.stroke();
+    //ctx.fill();
+    ctx.rotate(-radians);
+    ctx.translate(-centerX,-centerY);
+}
+			/* Start the animation loop */
+			animationLoop();
+
+		</script>
+	</body>
+</html>
