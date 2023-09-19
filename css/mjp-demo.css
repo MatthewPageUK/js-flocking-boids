@@ -2,7 +2,7 @@ body {
 	color: dimgrey;
 	padding: 0px;
 	margin: 0px;
-	font-family: 'Libre Baskerville', serif;
+	font-family: Figtree, sans-serif;
 	font-size: 0.8rem;
 	background-color: transparent;
 	overflow: hidden;
@@ -13,6 +13,7 @@ div, h1, h2, h3, p, button, footer, header {
 	overflow: hidden;
 	padding: 0px;
 	margin: 0px;
+	font-family: Figtree, sans-serif;
 }
 canvas {
 	position: absolute;
@@ -75,7 +76,7 @@ button:hover:disabled {
 	cursor: not-allowed;
 }
 button:disabled {
-	color: lightgray !important;
+	opacity: 0.5;
 }
 fieldset {
 	margin-top: 10px;
