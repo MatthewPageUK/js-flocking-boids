@@ -30,10 +30,10 @@
 			</fieldset>
 			<fieldset>
 				<legend>Flock Settings</legend>
-				<p><span class="label">Size </span><input id="setFlockSize" value="200" min="10" max="500" type="range" onchange="reset()">
+				<p><span class="label">Size </span><input id="setFlockSize" value="400" min="10" max="500" type="range" onchange="reset()">
 					<span class="rangeValue" id="displayFlockSize">0</span></p>
 			</fieldset>
-			<fieldset>
+			<fieldset style="display: none">
 				<legend>Perception</legend>
 				<p><span class="label">Rad </span><input type="range" min="0" max="500" step="1" value="465" id="setPRadius">
 					<span class="rangeValue" id="displayPRadius">0</span></p>
@@ -135,11 +135,6 @@
 				boidFlock.boids.forEach((boid)=>{
 					drawBoid(boid);
 				});
-				// /* Draw the predator */
-				// skyCTX.fillStyle = "red";
-				// skyCTX.beginPath();
-				// skyCTX.arc(250, 250, 5, 0, 2 * Math.PI);
-				// skyCTX.fill();
 
 				/* Update the Flock with the settings from the HTML DOM */
 				boidFlock.pRadius = settings.pRadius.value;
@@ -215,7 +210,7 @@
 			 */
 			function drawBoid(boid) {
 
-				/* Draw the perception radius and angle, just the firs boid */
+				/* Draw the perception radius and angle, just the first boid */
 				if(showPerception.checked && ( boid.index == 0 )) {
 					skyCTX.fillStyle = "rgba(255,255,255,0.3)";
 					skyCTX.beginPath();
@@ -232,14 +227,19 @@
 
 				/* Draw the Boid as a dot */
 				skyCTX.fillStyle = "#fbbf24";
+
+				// Colour based on position
 				// skyCTX.fillStyle = `hsl(${boid.position.x+boid.position.y}, ${boid.velocity.mag*30}%, 50%)`;
+
+				// Colour based on velocity
 				// skyCTX.fillStyle = `hsl(${boid.velocity.mag*100}, 100%, 50%)`;
+
 				skyCTX.beginPath();
 				skyCTX.arc(boid.position.x, boid.position.y, 5, 0, 2 * Math.PI);
 				skyCTX.fill();
 
 				/* Draw the boid as a triangle */
-				//drawPolygon(skyCTX, boid.position.x, boid.position.y, 3, 10, 1, 'white', 'white', boid.velocity.heading);
+				//drawPolygon(skyCTX, boid.position.x, boid.position.y, 3, 10, 1, '#fbbf24', '#fbbf24', boid.velocity.heading);
 
 				/* Draw the Vector line */
 				if(showVector.checked) {
@@ -254,24 +254,26 @@
 				}
 			}
 
-function drawPolygon(ctx, centerX,centerY,sideCount,size,strokeWidth,strokeColor,fillColor,radians){
-    ctx.translate(centerX,centerY);
-    ctx.rotate(radians);
-    ctx.beginPath();
-    //ctx.moveTo (size * Math.cos(0), size * Math.sin(0));
-	ctx.moveTo (size, 0);
-    for (var i = 1; i <= sideCount;i += 1) {
-        ctx.lineTo (size * Math.cos(i * 2 * Math.PI / 3), size * Math.sin(i * 2 * Math.PI / 3));
-    }
-    ctx.closePath();
-    ctx.fillStyle=fillColor;
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = strokeWidth;
-    ctx.stroke();
-    //ctx.fill();
-    ctx.rotate(-radians);
-    ctx.translate(-centerX,-centerY);
-}
+			// Draw a polygon - acquired from stackoverflow as a quick implementation
+			function drawPolygon(ctx, centerX,centerY,sideCount,size,strokeWidth,strokeColor,fillColor,radians){
+				ctx.translate(centerX,centerY);
+				ctx.rotate(radians);
+				ctx.beginPath();
+				ctx.moveTo (size, 0);
+				for (var i = 1; i <= sideCount;i += 1) {
+					ctx.lineTo (size * Math.cos(i * 2 * Math.PI / 3), size * Math.sin(i * 2 * Math.PI / 3));
+				}
+				ctx.closePath();
+				ctx.fillStyle=fillColor;
+				ctx.strokeStyle = strokeColor;
+				ctx.lineWidth = strokeWidth;
+				ctx.stroke();
+				//ctx.fill();
+				ctx.rotate(-radians);
+				ctx.translate(-centerX,-centerY);
+			}
+
+
 			/* Start the animation loop */
 			animationLoop();
 

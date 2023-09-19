@@ -5,13 +5,8 @@ body {
 	font-family: 'Libre Baskerville', serif;
 	font-size: 0.8rem;
 	background-color: transparent;
-	/* background-image: url(../gfx/back.png); */
-	/* background-repeat: no-repeat; */
-	/* background-attachment: fixed; */
-	/* background-position: bottom 0px left 0px; */
+	overflow: hidden;
 }
-a { color: darkblue; text-decoration: none; }
-a:hover { color: red; }
 div, h1, h2, h3, p, button, footer, header {
 	box-sizing: border-box;
 	position: relative;
