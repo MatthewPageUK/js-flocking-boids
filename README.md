@@ -1,5 +1,7 @@
 # js-flocking-boids
 
+![https://media.mjp.co/storage/users/mjp-web/boids-1.jpg]
+
 Flocking Boids - Craig Reynolds Algorithm
 
 Implemented in Javascript by Matthew Page <work@mjp.co>
